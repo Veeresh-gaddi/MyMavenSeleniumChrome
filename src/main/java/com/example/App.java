@@ -3,7 +3,6 @@ package com.example;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.WindowType;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Actions;
@@ -17,16 +16,22 @@ public class App {
     public static void main(String[] args) throws InterruptedException {
 
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--start-maximized"); // optional
+
+        // Required for Jenkins (Linux headless execution)
+        options.addArguments("--headless=new");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--window-size=1920,1080");
+        options.addArguments("--remote-allow-origins=*");
 
         WebDriver driver = new ChromeDriver(options);
 
-        driver.manage().window().setSize(new org.openqa.selenium.Dimension(1920, 1080));
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
 
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
-
         Actions actions = new Actions(driver);
 
+        // 🔹 Step 1: SauceDemo Login
         driver.get("https://www.saucedemo.com/");
 
         driver.findElement(By.id("user-name")).sendKeys("standard_user");
@@ -35,8 +40,7 @@ public class App {
 
         System.out.println("SauceDemo login successful");
 
-        driver.switchTo().newWindow(WindowType.TAB);
-
+        // 🔹 Step 2: Automation Exercise (NO new tab)
         driver.get("https://automationexercise.com/products");
 
         driver.findElement(By.id("search_product")).sendKeys("Men Tshirt");
@@ -61,15 +65,11 @@ public class App {
         );
 
         ((org.openqa.selenium.JavascriptExecutor) driver)
-                .executeScript("arguments[0].scrollIntoView(true);", viewCart);
-
-        ((org.openqa.selenium.JavascriptExecutor) driver)
                 .executeScript("arguments[0].click();", viewCart);
 
         System.out.println("Automation Exercise product added to cart");
 
-        driver.switchTo().newWindow(WindowType.TAB);
-
+        // 🔹 Step 3: Practice Test Automation (NO new tab)
         driver.get("https://practicetestautomation.com/practice-test-login/");
 
         Thread.sleep(2000);
